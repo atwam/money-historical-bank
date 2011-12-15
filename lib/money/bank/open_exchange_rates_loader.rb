@@ -8,7 +8,7 @@ class Money
   module Bank
     module OpenExchangeRatesLoader
       HIST_URL = 'https://raw.github.com/currencybot/open-exchange-rates/master/historical/'
-      OER_URL = 'http://openexchangerates.org/latest.php'
+      OER_URL = 'https://raw.github.com/currencybot/open-exchange-rates/master/latest.json'
 
       # Tries to load data from OpenExchangeRates for the given rate.
       # Won't do anything if there's no data available for that date
