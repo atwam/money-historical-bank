@@ -21,6 +21,12 @@ describe Money::Bank::HistoricalBank do
       @bank.get_rate(d2, "GBP", "USD").must_equal 1.456
     end
 
+    it "shouldn't throw an error when internal_set_rate is called with a non existing currency" do
+      d1 = Date.new(2011,1,1)
+      @bank.set_rate(d1, "BLA", "ZZZ", 1.01)
+      @bank.rates.must_be_empty
+    end
+
     it "should return the correct rate interpolated from existing pairs when asked" do
       d1 = Date.new(2001,1,1)
       @bank.set_rate(d1, "USD", "EUR", 1.234)

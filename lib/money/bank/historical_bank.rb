@@ -256,8 +256,10 @@ class Money
       #
       # @return [Numeric]
       def internal_set_rate(date, from, to, rate)
-        date_rates = @rates[date] ||= {}
-        date_rates[rate_key_for(from, to)] = rate
+        if Money::Currency.find(from) && Money::Currency.find(to)
+          date_rates = @rates[date] ||= {}
+          date_rates[rate_key_for(from, to)] = rate
+        end
       end
     end
   end
