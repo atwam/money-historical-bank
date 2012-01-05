@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "money-historical-bank"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/coutud/#{s.name}"
   s.authors = "Damien Couture"
