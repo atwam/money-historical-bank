@@ -20,6 +20,7 @@ class Money
                          # Should we use strftime, does to_s have better performance ? Or is it localized accross systems ?
                          HIST_URL + date.to_s + '.json'
                        end
+        rates_source << "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}" if ENV['OPENEXCHANGERATES_APP_ID']
         doc = Yajl::Parser.parse(open(rates_source).read)
 
         base_currency = doc['base'] || 'USD'
