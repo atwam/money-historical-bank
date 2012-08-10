@@ -66,4 +66,22 @@ describe Money::Bank::HistoricalBank do
     end
   end
 
+  describe 'export/import' do
+    before do
+      @bank = Money::Bank::HistoricalBank.new
+    end
+    it "should store any rate stored for a date, and retrieve it after importing exported json" do
+      d1 = Date.new(2001,1,1)
+      d2 = Date.new(2002,1,1)
+      @bank.set_rate(d1, "USD", "EUR", 1.234)
+      @bank.set_rate(d2, "GBP", "USD", 1.456)
+
+      json = @bank.export_rates(:json)
+      @bank.import_rates(:json, json)
+
+      @bank.get_rate(d1, "USD", "EUR").must_equal 1.234
+      @bank.get_rate(d2, "GBP", "USD").must_equal 1.456
+    end
+  end
+
 end
