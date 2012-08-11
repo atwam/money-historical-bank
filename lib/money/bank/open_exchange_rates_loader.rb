@@ -15,7 +15,7 @@ class Money
       # in OpenExchangeRates (short) history.
       def load_data(date)
         rates_source = if date == Date.today
-                         OER_URL
+                         OER_URL.dup
                        else
                          # Should we use strftime, does to_s have better performance ? Or is it localized accross systems ?
                          HIST_URL + date.to_s + '.json'
