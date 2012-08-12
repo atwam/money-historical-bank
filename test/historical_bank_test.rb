@@ -54,6 +54,7 @@ describe Money::Bank::HistoricalBank do
     before do
       @bank = Money::Bank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
+      ENV['OPENEXCHANGERATES_APP_ID'] = nil
     end
 
     it 'should download new rates from url' do
