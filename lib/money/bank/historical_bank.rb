@@ -60,9 +60,9 @@ class Money
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
         @mutex.synchronize do
-          unless existing_rates = @rates[date]
+          unless existing_rates = @rates[date.to_s]
             load_data(date)
-            existing_rates = @rates[date]
+            existing_rates = @rates[date.to_s]
           end
           rate = nil
           if existing_rates
@@ -257,7 +257,7 @@ class Money
       # @return [Numeric]
       def internal_set_rate(date, from, to, rate)
         if Money::Currency.find(from) && Money::Currency.find(to)
-          date_rates = @rates[date] ||= {}
+          date_rates = @rates[date.to_s] ||= {}
           date_rates[rate_key_for(from, to)] = rate
         end
       end
