@@ -15,11 +15,12 @@ class Money
       # in OpenExchangeRates (short) history.
       def load_data(date)
         rates_source = if date == Date.today
-                         OER_URL
+                         OER_URL.dup
                        else
                          # Should we use strftime, does to_s have better performance ? Or is it localized accross systems ?
                          HIST_URL + date.to_s + '.json'
                        end
+        rates_source << "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}" if ENV['OPENEXCHANGERATES_APP_ID']
         doc = Yajl::Parser.parse(open(rates_source).read)
 
         base_currency = doc['base'] || 'USD'
