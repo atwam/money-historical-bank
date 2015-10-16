@@ -7,8 +7,8 @@ require 'open-uri'
 class Money
   module Bank
     module OpenExchangeRatesLoader
-      HIST_URL = 'http://openexchangerates.org/historical/'
-      OER_URL = 'http://openexchangerates.org/latest.json'
+      HIST_URL = 'http://openexchangerates.org/api/historical/'
+      OER_URL = 'http://openexchangerates.org/api/latest.json'
 
       # Tries to load data from OpenExchangeRates for the given rate.
       # Won't do anything if there's no data available for that date
@@ -17,8 +17,7 @@ class Money
         rates_source = if date == Date.today
                          OER_URL.dup
                        else
-                         # Should we use strftime, does to_s have better performance ? Or is it localized accross systems ?
-                         HIST_URL + date.to_s + '.json'
+                         HIST_URL + date.strftime('%Y-%m-%d') + '.json'
                        end
         rates_source << "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}" if ENV['OPENEXCHANGERATES_APP_ID']
         doc = Yajl::Parser.parse(open(rates_source).read)
