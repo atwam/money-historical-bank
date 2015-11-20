@@ -147,13 +147,13 @@ class Money
         cents = BigDecimal.new(from.cents.to_s) / (BigDecimal.new(from.currency.subunit_to_unit.to_s) / BigDecimal.new(_to_currency_.subunit_to_unit.to_s))
 
         ex = cents * BigDecimal.new(rate.to_s)
-        ex = ex.to_f
+
         ex = if block_given?
                yield ex
              elsif @rounding_method
                @rounding_method.call(ex)
              else
-               ex.to_s.to_i
+               ex
              end
         Money.new(ex, _to_currency_)
       end
