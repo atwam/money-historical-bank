@@ -10,6 +10,7 @@ class Money
 
     class HistoricalBank < Base
       include Money::Bank::OpenExchangeRatesLoader
+      include Money::Bank::HistoricalBankConfigure
 
       attr_reader :rates
       # Available formats for importing/exporting rates.
@@ -59,6 +60,10 @@ class Money
       #   bank.get_rate(d1, "USD", "CAD") #=> 1.24515
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
+        date_formated = date.strftime(HistoricalBank.config.date_format)
+        rate = HistoricalBank.load(HistoricalBank.build_key(date_formated, from, to))
+        return rate unless rate.nil?
+
         @mutex.synchronize do
           unless existing_rates = @rates[date.to_s]
             load_data(date)
