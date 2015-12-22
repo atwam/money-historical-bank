@@ -3,14 +3,14 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 require 'byebug'
 
-describe Money::TimeMachineBank::HistoricalBank do
+describe TimeMachineBank::HistoricalBank do
 
   describe 'update_rates' do
     before do
-      @bank = Money::TimeMachineBank::HistoricalBank.new
+      @bank = TimeMachineBank::HistoricalBank.new
       #@bank.cache = @cache_path
       #@bank.update_rates
-      Money::TimeMachineBank::HistoricalBank.configure do |config|
+      TimeMachineBank::HistoricalBank.configure do |config|
         config.date_format = '%Y-%m-%d'
         config.adapter = :Redis
         config.expires = 1
@@ -58,10 +58,10 @@ describe Money::TimeMachineBank::HistoricalBank do
 
   describe 'no rates available yet' do
     before do
-      @bank = Money::TimeMachineBank::HistoricalBank.new
+      @bank = TimeMachineBank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
       ENV['OPENEXCHANGERATES_APP_ID'] = nil
-      Money::TimeMachineBank::HistoricalBank.configure do |config|
+      TimeMachineBank::HistoricalBank.configure do |config|
         config.date_format = '%Y-%m-%d'
         config.adapter = :Redis
         config.expires = 1
@@ -70,7 +70,7 @@ describe Money::TimeMachineBank::HistoricalBank do
     end
 
     it 'should download new rates from url' do
-      source = Money::TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json'
+      source = TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json'
       stub(@bank).open(source) { File.open @cache_path }
       d1 = Date.new(2009,9,9)
 
@@ -81,7 +81,7 @@ describe Money::TimeMachineBank::HistoricalBank do
     describe 'environment variable set with api id' do
       before do
         ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
-        Money::TimeMachineBank::HistoricalBank.configure do |config|
+        TimeMachineBank::HistoricalBank.configure do |config|
           config.date_format = '%Y-%m-%d'
           config.adapter = :Redis
           config.expires = 1
@@ -89,7 +89,7 @@ describe Money::TimeMachineBank::HistoricalBank do
         end
       end
       it 'should download new rates from url' do
-        source = Money::TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
+        source = TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
         stub(@bank).open(source) { File.open @cache_path }
         d1 = Date.new(2009,9,9)
 
@@ -103,8 +103,8 @@ describe Money::TimeMachineBank::HistoricalBank do
 
   describe 'export/import' do
     before do
-      @bank = Money::TimeMachineBank::HistoricalBank.new
-      Money::TimeMachineBank::HistoricalBank.configure do |config|
+      @bank = TimeMachineBank::HistoricalBank.new
+      TimeMachineBank::HistoricalBank.configure do |config|
         config.date_format = '%Y-%m-%d'
         config.adapter = :Redis
         config.expires = 1
