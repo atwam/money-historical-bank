@@ -3,14 +3,15 @@ require 'money'
 require 'date'
 
 require File.expand_path(File.dirname(__FILE__)) + "/open_exchange_rates_loader"
+require File.expand_path(File.dirname(__FILE__)) + "/historical_bank_configure"
 
 class Money
   module TimeMachineBank
     class InvalidCache < StandardError ; end
 
-    class HistoricalBank < Base
+    class HistoricalBank < Money::Bank::Base
       include Money::TimeMachineBank::OpenExchangeRatesLoader
-      include Money::TimeMachineBank::HistoricalBankConfigure
+      extend Money::TimeMachineBank::HistoricalBankConfigure
 
       attr_reader :rates
       # Available formats for importing/exporting rates.
@@ -60,8 +61,7 @@ class Money
       #   bank.get_rate(d1, "USD", "CAD") #=> 1.24515
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
-        date_formated = date.strftime(Money::TimeMachineBank::HistoricalBank.config.date_format)
-        rate = Money::TimeMachineBank::HistoricalBank.load(Money::TimeMachineBank::HistoricalBank.build_key(date_formated, from, to))
+        rate = Money::TimeMachineBank::HistoricalBank.load(Money::TimeMachineBank::HistoricalBank.build_key(date, from, to))
         return rate unless rate.nil?
 
         @mutex.synchronize do
@@ -149,7 +149,7 @@ class Money
         end
         _to_currency_  = Currency.wrap(to_currency)
 
-        cents = BigDecimal.new(from.cents.to_s) / (BigDecimal.new(from.currency.subunit_to_unit.to_s) / BigDecimal.new(_to_currency_.subunit_to_unit.to_s))
+        cents = BigDecimal.new(from.cents) * 100
 
         ex = cents * BigDecimal.new(rate.to_s)
 

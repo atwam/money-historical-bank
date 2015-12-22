@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name = "money-historical-bank"
   s.version = "0.0.3"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
-  s.homepage = "http://github.com/atwam/#{s.name}"
+  s.homepage = "https://github.com/atwam/#{s.name}"
   s.authors = "atwam"
   s.email = "wam@atwam.com"
   s.description = "A gem that provides rates for the money gem. Able to handle history (rates varying in time), and auto download rates from open-exchange-rates. Highly inspired by money-open-exchange-rates gem."
@@ -16,4 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "money", ">=3.7.1"
   s.add_development_dependency "minitest", ">=2.0"
   s.add_development_dependency "rr", ">=1.0.4"
+  s.add_development_dependency "moneta", "~> 0.8"
+  s.add_development_dependency "hashie"
+  s.add_development_dependency "redis", '~>3.2' 
 end

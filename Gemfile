@@ -1,7 +1,6 @@
-source :rubygems
+source "https://rubygems.org"
 
 gemspec
 
 gem 'rake'
-gem 'moneta', '~> 0.8'
-gem 'hashie'
+gem 'byebug'

@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
+require 'byebug'
 
 describe Money::TimeMachineBank::HistoricalBank do
 
@@ -9,6 +10,12 @@ describe Money::TimeMachineBank::HistoricalBank do
       @bank = Money::TimeMachineBank::HistoricalBank.new
       #@bank.cache = @cache_path
       #@bank.update_rates
+      Money::TimeMachineBank::HistoricalBank.configure do |config|
+        config.date_format = '%Y-%m-%d'
+        config.adapter = :Redis
+        config.expires = 1
+        config.connection_string = "127.0.0.1:#{ENV["REDIS_PORT"] || 6379}"
+      end
     end
 
     it "should store any rate stored for a date, and retrieve it when asked" do
@@ -39,22 +46,27 @@ describe Money::TimeMachineBank::HistoricalBank do
     it "should return the correct rates using exchange_with a date" do
       d1 = Date.new(2001,1,1)
       @bank.set_rate(d1, "USD", "EUR", 0.73062465)
-      @bank.exchange_with(d1, 5000.to_money('EUR'), 'USD').cents.must_equal 684345
+      @bank.exchange_with(d1, Money.new(5000, 'EUR'), 'USD').cents.must_equal 684346
     end
     it "should return the correct rates using exchange_with no date (today)" do
       d1 = Date.today
       @bank.set_rate(d1, "USD", "EUR", 0.8)
-      @bank.exchange_with(5000.to_money('EUR'), 'USD').cents.must_equal 625000
+      @bank.exchange_with(Money.new(5000, 'EUR'), 'USD').cents.must_equal 625000
     end
 
   end
 
   describe 'no rates available yet' do
-    include RR::Adapters::TestUnit
     before do
       @bank = Money::TimeMachineBank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
       ENV['OPENEXCHANGERATES_APP_ID'] = nil
+      Money::TimeMachineBank::HistoricalBank.configure do |config|
+        config.date_format = '%Y-%m-%d'
+        config.adapter = :Redis
+        config.expires = 1
+        config.connection_string = "127.0.0.1:#{ENV["REDIS_PORT"] || 6379}"
+      end
     end
 
     it 'should download new rates from url' do
@@ -69,6 +81,12 @@ describe Money::TimeMachineBank::HistoricalBank do
     describe 'environment variable set with api id' do
       before do
         ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
+        Money::TimeMachineBank::HistoricalBank.configure do |config|
+          config.date_format = '%Y-%m-%d'
+          config.adapter = :Redis
+          config.expires = 1
+          config.connection_string = "127.0.0.1:#{ENV["REDIS_PORT"] || 6379}"
+        end
       end
       it 'should download new rates from url' do
         source = Money::TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
@@ -86,6 +104,12 @@ describe Money::TimeMachineBank::HistoricalBank do
   describe 'export/import' do
     before do
       @bank = Money::TimeMachineBank::HistoricalBank.new
+      Money::TimeMachineBank::HistoricalBank.configure do |config|
+        config.date_format = '%Y-%m-%d'
+        config.adapter = :Redis
+        config.expires = 1
+        config.connection_string = "127.0.0.1:#{ENV["REDIS_PORT"] || 6379}"
+      end
     end
     it "should store any rate stored for a date, and retrieve it after importing exported json" do
       d1 = Date.new(2001,1,1)

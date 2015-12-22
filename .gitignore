@@ -2,3 +2,5 @@
 *.gem
 *.swp
 .yardoc
+dump.rdb
+.byebug_history

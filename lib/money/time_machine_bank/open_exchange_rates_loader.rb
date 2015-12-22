@@ -5,7 +5,7 @@ require 'yajl'
 require 'open-uri'
 
 class Money
-  module Bank
+  module TimeMachineBank
     module OpenExchangeRatesLoader
       HIST_URL = 'http://openexchangerates.org/api/historical/'
       OER_URL = 'http://openexchangerates.org/api/latest.json'
@@ -31,7 +31,7 @@ class Money
           # Don't use set_rate here, since this method can only be called from
           # get_rate, which already aquired a mutex.
           internal_set_rate(date, base_currency, currency, rate)
-          Money::TimeMachineBank::HistoricalBank.store(Money::TimeMachineBank::HistoricalBank.build_key(date_formated, base_currency, currency), rate, expires: false)
+          Money::TimeMachineBank::HistoricalBank.store(Money::TimeMachineBank::HistoricalBank.build_key(date, base_currency, currency), rate)
         end
       end
     end

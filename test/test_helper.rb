@@ -2,4 +2,4 @@
 require 'minitest/autorun'
 require 'rr'
 require 'date'
-require 'money/bank/historical_bank'
+require 'money/time_machine_bank/historical_bank'

@@ -1,4 +1,5 @@
 require 'moneta'
+require 'hashie/mash'
 
 class Money
   module TimeMachineBank
@@ -26,7 +27,7 @@ class Money
 
       def build_key(date, from, to)
         #TODO refactor to config
-        "#{date}:#{from}:#{to}"
+        "#{date.strftime('%Y-%m')}:#{from}:#{to}"
       end
 
       def adapter
