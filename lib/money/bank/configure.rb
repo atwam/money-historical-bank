@@ -1,5 +1,7 @@
+require 'moneta'
+
 class Money
-  module Bank
+  module TimeMachineBank
     module HistoricalBankConfigure
       extend self
       

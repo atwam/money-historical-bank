@@ -5,12 +5,12 @@ require 'date'
 require File.expand_path(File.dirname(__FILE__)) + "/open_exchange_rates_loader"
 
 class Money
-  module Bank
+  module TimeMachineBank
     class InvalidCache < StandardError ; end
 
     class HistoricalBank < Base
-      include Money::Bank::OpenExchangeRatesLoader
-      include Money::Bank::HistoricalBankConfigure
+      include Money::TimeMachineBank::OpenExchangeRatesLoader
+      include Money::TimeMachineBank::HistoricalBankConfigure
 
       attr_reader :rates
       # Available formats for importing/exporting rates.
@@ -32,7 +32,7 @@ class Money
       #
       # @return [Numeric]
       # @example
-      #   bank = Money::Bank::HistoricalBank.new
+      #   bank = Money::TimeMachineBank::HistoricalBank.new
       #   bank.set_rate(Date.new(2001, 1, 1), "USD", "CAD", 1.24514)
       def set_rate(date, from, to, rate)
         @mutex.synchronize do
@@ -51,7 +51,7 @@ class Money
       # @return [Numeric]
       #
       # @example
-      #   bank = Money::Bank::HistoricalBank.new
+      #   bank = Money::TimeMachineBank::HistoricalBank.new
       #   d1 = Date.new(2001, 1, 1)
       #   d2 = Date.new(2002, 1, 1)
       #   bank.set_rate(d1, "USD", "CAD", 1.24515)
@@ -60,8 +60,8 @@ class Money
       #   bank.get_rate(d1, "USD", "CAD") #=> 1.24515
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
-        date_formated = date.strftime(HistoricalBank.config.date_format)
-        rate = HistoricalBank.load(HistoricalBank.build_key(date_formated, from, to))
+        date_formated = date.strftime(Money::TimeMachineBank::HistoricalBank.config.date_format)
+        rate = Money::TimeMachineBank::HistoricalBank.load(Money::TimeMachineBank::HistoricalBank.build_key(date_formated, from, to))
         return rate unless rate.nil?
 
         @mutex.synchronize do
@@ -123,10 +123,10 @@ class Money
       #
       # @return [Money]
       #
-      # @raise +Money::Bank::UnknownRate+ if the conversion rate is unknown.
+      # @raise +Money::TimeMachineBank::UnknownRate+ if the conversion rate is unknown.
       #
       # @example
-      #   bank = Money::Bank::VariableExchange.new
+      #   bank = Money::TimeMachineBank::VariableExchange.new
       #   bank.add_rate(Date.today, "USD", "CAD", 1.24515)
       #   bank.add_rate(Date.new(2011,1,1), "CAD", "USD", 0.803115)
       #
@@ -172,17 +172,17 @@ class Money
       #
       # @return [String]
       #
-      # @raise +Money::Bank::UnknownRateFormat+ if format is unknown.
+      # @raise +Money::TimeMachineBank::UnknownRateFormat+ if format is unknown.
       #
       # @example
-      #   bank = Money::Bank::VariableExchange.new
+      #   bank = Money::TimeMachineBank::VariableExchange.new
       #   bank.set_rate("USD", "CAD", 1.24515)
       #   bank.set_rate("CAD", "USD", 0.803115)
       #
       #   s = bank.export_rates(:json)
       #   s #=> "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
       def export_rates(format, file=nil)
-        raise Money::Bank::UnknownRateFormat unless
+        raise Money::TimeMachineBank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
         s = ""
@@ -211,17 +211,17 @@ class Money
       #
       # @return [self]
       #
-      # @raise +Money::Bank::UnknownRateFormat+ if format is unknown.
+      # @raise +Money::TimeMachineBank::UnknownRateFormat+ if format is unknown.
       #
       # @example
       #   s = "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
-      #   bank = Money::Bank::VariableExchange.new
+      #   bank = Money::TimeMachineBank::VariableExchange.new
       #   bank.import_rates(:json, s)
       #
       #   bank.get_rate("USD", "CAD") #=> 1.24515
       #   bank.get_rate("CAD", "USD") #=> 0.803115
       def import_rates(format, s)
-        raise Money::Bank::UnknownRateFormat unless
+        raise Money::TimeMachineBank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
         @mutex.synchronize {

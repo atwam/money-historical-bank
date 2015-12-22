@@ -2,11 +2,11 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
-describe Money::Bank::HistoricalBank do
+describe Money::TimeMachineBank::HistoricalBank do
 
   describe 'update_rates' do
     before do
-      @bank = Money::Bank::HistoricalBank.new
+      @bank = Money::TimeMachineBank::HistoricalBank.new
       #@bank.cache = @cache_path
       #@bank.update_rates
     end
@@ -52,13 +52,13 @@ describe Money::Bank::HistoricalBank do
   describe 'no rates available yet' do
     include RR::Adapters::TestUnit
     before do
-      @bank = Money::Bank::HistoricalBank.new
+      @bank = Money::TimeMachineBank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
       ENV['OPENEXCHANGERATES_APP_ID'] = nil
     end
 
     it 'should download new rates from url' do
-      source = Money::Bank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json'
+      source = Money::TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json'
       stub(@bank).open(source) { File.open @cache_path }
       d1 = Date.new(2009,9,9)
 
@@ -71,7 +71,7 @@ describe Money::Bank::HistoricalBank do
         ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
       end
       it 'should download new rates from url' do
-        source = Money::Bank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
+        source = Money::TimeMachineBank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
         stub(@bank).open(source) { File.open @cache_path }
         d1 = Date.new(2009,9,9)
 
@@ -85,7 +85,7 @@ describe Money::Bank::HistoricalBank do
 
   describe 'export/import' do
     before do
-      @bank = Money::Bank::HistoricalBank.new
+      @bank = Money::TimeMachineBank::HistoricalBank.new
     end
     it "should store any rate stored for a date, and retrieve it after importing exported json" do
       d1 = Date.new(2001,1,1)
