@@ -7,8 +7,8 @@ require 'open-uri'
 class Money
   module Bank
     module OpenExchangeRatesLoader
-      HIST_URL = 'http://openexchangerates.org/api/historical/'
-      OER_URL = 'http://openexchangerates.org/api/latest.json'
+      HIST_URL = 'https://openexchangerates.org/api/historical/'
+      OER_URL = 'https://openexchangerates.org/api/latest.json'
 
       # Tries to load data from OpenExchangeRates for the given rate.
       # Won't do anything if there's no data available for that date
