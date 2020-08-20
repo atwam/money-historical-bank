@@ -1,5 +1,5 @@
 # Money Historical Bank
-[![Build Status](https://secure.travis-ci.org/coutud/money-historical-bank.png)](http://travis-ci.org/coutud/money-historical-bank)
+[![Build Status](https://secure.travis-ci.org/jonallured/money-historical-bank.png)](http://travis-ci.org/jonallured/money-historical-bank)
 
 A gem that add a `Money::Bank` able to handle historical rates, and infer rates from limited rates.
 
