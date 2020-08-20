@@ -39,12 +39,14 @@ describe Money::Bank::HistoricalBank do
     it "should return the correct rates using exchange_with a date" do
       d1 = Date.new(2001,1,1)
       @bank.set_rate(d1, "USD", "EUR", 0.73062465)
-      @bank.exchange_with(d1, 5000.to_money('EUR'), 'USD').cents.must_equal 684345
+      from = Money.new(5000, 'EUR')
+      @bank.exchange_with(d1, from, 'USD').cents.must_equal 6843
     end
     it "should return the correct rates using exchange_with no date (today)" do
       d1 = Date.today
       @bank.set_rate(d1, "USD", "EUR", 0.8)
-      @bank.exchange_with(5000.to_money('EUR'), 'USD').cents.must_equal 625000
+      from = Money.new(5000, 'EUR')
+      @bank.exchange_with(from, 'USD').cents.must_equal 6250
     end
 
   end
