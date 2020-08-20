@@ -14,7 +14,7 @@ class Money
       attr_reader :rates
       # Available formats for importing/exporting rates.
       RATE_FORMATS = [:json, :ruby, :yaml]
-      
+
       def setup
         @rates = {}
         @mutex = Mutex.new
@@ -38,7 +38,7 @@ class Money
           internal_set_rate(date, from, to, rate)
         end
       end
-      
+
       # Retrieve the rate for the given currencies. Uses +Mutex+ to synchronize
       # data access. If no rates have been set for +date+, will try to load them
       # using #load_data.
@@ -90,7 +90,7 @@ class Money
           rate
         end
       end
-      
+
       #
       # @overload exchange_with(from, to_currency)
       #   Exchanges the given +Money+ object to a new +Money+ object in
@@ -144,9 +144,9 @@ class Money
         end
         _to_currency_  = Currency.wrap(to_currency)
 
-        cents = BigDecimal.new(from.cents.to_s) / (BigDecimal.new(from.currency.subunit_to_unit.to_s) / BigDecimal.new(_to_currency_.subunit_to_unit.to_s))
+        cents = BigDecimal(from.cents.to_s) / (BigDecimal(from.currency.subunit_to_unit.to_s) / BigDecimal(_to_currency_.subunit_to_unit.to_s))
 
-        ex = cents * BigDecimal.new(rate.to_s)
+        ex = cents * BigDecimal(rate.to_s)
         ex = ex.to_f
         ex = if block_given?
                yield ex
