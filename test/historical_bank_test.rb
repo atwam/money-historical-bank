@@ -17,14 +17,14 @@ describe Money::Bank::HistoricalBank do
       @bank.set_rate(d1, "USD", "EUR", 1.234)
       @bank.set_rate(d2, "GBP", "USD", 1.456)
 
-      @bank.get_rate(d1, "USD", "EUR").must_equal 1.234
-      @bank.get_rate(d2, "GBP", "USD").must_equal 1.456
+      assert_equal @bank.get_rate(d1, "USD", "EUR"), 1.234
+      assert_equal @bank.get_rate(d2, "GBP", "USD"), 1.456
     end
 
     it "shouldn't throw an error when internal_set_rate is called with a non existing currency" do
       d1 = Date.new(2011,1,1)
       @bank.set_rate(d1, "BLA", "ZZZ", 1.01)
-      @bank.rates.must_be_empty
+      assert_empty @bank.rates
     end
 
     it "should return the correct rate interpolated from existing pairs when asked" do
@@ -32,21 +32,21 @@ describe Money::Bank::HistoricalBank do
       @bank.set_rate(d1, "USD", "EUR", 1.234)
       @bank.set_rate(d1, "GBP", "USD", 1.456)
 
-      @bank.get_rate(d1, "EUR", "USD").must_be_within_epsilon 1.0 / 1.234
-      @bank.get_rate(d1, "GBP", "EUR").must_be_within_epsilon 1.456 * 1.234
+      assert_in_epsilon @bank.get_rate(d1, "EUR", "USD"), 1.0 / 1.234
+      assert_in_epsilon @bank.get_rate(d1, "GBP", "EUR"), 1.456 * 1.234
     end
 
     it "should return the correct rates using exchange_with a date" do
       d1 = Date.new(2001,1,1)
       @bank.set_rate(d1, "USD", "EUR", 0.73062465)
       from = Money.new(5000, 'EUR')
-      @bank.exchange_with(d1, from, 'USD').cents.must_equal 6843
+      assert_equal @bank.exchange_with(d1, from, 'USD').cents, 6843
     end
     it "should return the correct rates using exchange_with no date (today)" do
       d1 = Date.today
       @bank.set_rate(d1, "USD", "EUR", 0.8)
       from = Money.new(5000, 'EUR')
-      @bank.exchange_with(from, 'USD').cents.must_equal 6250
+      assert_equal @bank.exchange_with(from, 'USD').cents, 6250
     end
 
   end
@@ -64,7 +64,7 @@ describe Money::Bank::HistoricalBank do
       d1 = Date.new(2009,9,9)
 
       rate = @bank.get_rate(d1, 'USD', 'EUR')
-      rate.must_equal 0.73062465
+      assert_equal rate, 0.73062465
     end
 
     describe 'environment variable set with api id' do
@@ -77,7 +77,7 @@ describe Money::Bank::HistoricalBank do
         d1 = Date.new(2009,9,9)
 
         rate = @bank.get_rate(d1, 'USD', 'EUR')
-        rate.must_equal 0.73062465
+        assert_equal rate, 0.73062465
       end
     end
 
@@ -97,8 +97,8 @@ describe Money::Bank::HistoricalBank do
       json = @bank.export_rates(:json)
       @bank.import_rates(:json, json)
 
-      @bank.get_rate(d1, "USD", "EUR").must_equal 1.234
-      @bank.get_rate(d2, "GBP", "USD").must_equal 1.456
+      assert_equal @bank.get_rate(d1, "USD", "EUR"), 1.234
+      assert_equal @bank.get_rate(d2, "GBP", "USD"), 1.456
     end
   end
 
