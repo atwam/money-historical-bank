@@ -52,7 +52,6 @@ describe Money::Bank::HistoricalBank do
   end
 
   describe 'no rates available yet' do
-    include RR::Adapters::TestUnit
     before do
       @bank = Money::Bank::HistoricalBank.new
       @cache_path = "#{File.dirname(__FILE__)}/test.json"
