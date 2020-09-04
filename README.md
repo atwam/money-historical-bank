@@ -48,5 +48,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Copyright © 2012 Damien Couture <wam@atwam.com>
 
-[travis]: https://travis-ci.org/github/jonallured/money-historical-bank
-[badge]: https://travis-ci.org/jonallured/money-historical-bank.svg
+[travis]: https://travis-ci.org/github/atwam/money-historical-bank
+[badge]: https://travis-ci.org/atwam/money-historical-bank.svg
