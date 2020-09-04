@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.license = "MIT"
-  s.add_dependency "yajl-ruby", "~>0.8", ">=0.8.3"
+  s.add_dependency "yajl-ruby", "~>1.3", ">=1.3.1"
   s.add_dependency "money", "~>3.7", ">=3.7.1"
   s.add_development_dependency "minitest", "~>2.0", ">=2.0"
   s.add_development_dependency "rr", "~>1.0", ">=1.0.4"
