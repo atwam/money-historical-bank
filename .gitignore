@@ -2,3 +2,5 @@
 *.gem
 *.swp
 .yardoc
+.bundle
+vendor
