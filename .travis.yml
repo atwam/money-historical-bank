@@ -1,5 +1,14 @@
 language: ruby
+
 rvm:
  - 2.7
  - 2.6
  - 2.5
+
+deploy:
+  provider: rubygems
+  api_key:
+    secure: shhhh
+  gem: money-historical-bank
+  on:
+    tags: true
