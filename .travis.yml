@@ -1,5 +1,13 @@
 language: ruby
 rvm:
- - 2.7
- - 2.6
- - 2.5
+- 2.7
+- 2.6
+- 2.5
+deploy:
+  provider: rubygems
+  api_key:
+    secure: c3Wysc0Xsdz2i5zcgvOi8ph0cD/8vCBiD+A3ZXzN045H+u2ePWVSXkRMjlupFFSwb7DN1d7FmloclogzwgrhoS4Cc7wQdicSWyF1idpSKq3EjAfGRGqzRs91DDGYYP1DKmtUq/zQVed//b7a8BzCbZcmmKK+pwyswvaHW62cOuQ=
+  gem: money-historical-bank
+  on:
+    tags: true
+    # repo: atwam/money-historical-bank
