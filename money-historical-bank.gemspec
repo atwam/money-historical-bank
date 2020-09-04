@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = "money-historical-bank"
-  s.version = "0.0.3"
+  s.version = "0.0.4"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/atwam/#{s.name}"
-  s.authors = "atwam"
-  s.email = "wam@atwam.com"
+  s.authors = ["atwam", "Jon Allured"]
+  s.email = ["wam@atwam.com", "jon.allured@gmail.com"]
   s.description = "A gem that provides rates for the money gem. Able to handle history (rates varying in time), and auto download rates from open-exchange-rates. Highly inspired by money-open-exchange-rates gem."
   s.summary = "A gem that offers exchange rates varying in time."
   s.extra_rdoc_files = %w(README.markdown)
