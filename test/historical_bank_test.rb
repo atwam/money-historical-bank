@@ -1,54 +1,52 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::HistoricalBank do
-
   describe 'update_rates' do
     before do
       @bank = Money::Bank::HistoricalBank.new
-      #@bank.cache = @cache_path
-      #@bank.update_rates
+      # @bank.cache = @cache_path
+      # @bank.update_rates
     end
 
-    it "should store any rate stored for a date, and retrieve it when asked" do
-      d1 = Date.new(2001,1,1)
-      d2 = Date.new(2002,1,1)
-      @bank.set_rate(d1, "USD", "EUR", 1.234)
-      @bank.set_rate(d2, "GBP", "USD", 1.456)
+    it 'should store any rate stored for a date, and retrieve it when asked' do
+      d1 = Date.new(2001, 1, 1)
+      d2 = Date.new(2002, 1, 1)
+      @bank.set_rate(d1, 'USD', 'EUR', 1.234)
+      @bank.set_rate(d2, 'GBP', 'USD', 1.456)
 
-      assert_equal @bank.get_rate(d1, "USD", "EUR"), 1.234
-      assert_equal @bank.get_rate(d2, "GBP", "USD"), 1.456
+      assert_equal @bank.get_rate(d1, 'USD', 'EUR'), 1.234
+      assert_equal @bank.get_rate(d2, 'GBP', 'USD'), 1.456
     end
 
     it "shouldn't throw an error when internal_set_rate is called with a non existing currency" do
-      d1 = Date.new(2011,1,1)
-      @bank.set_rate(d1, "BLA", "ZZZ", 1.01)
+      d1 = Date.new(2011, 1, 1)
+      @bank.set_rate(d1, 'BLA', 'ZZZ', 1.01)
       assert_empty @bank.rates
     end
 
-    it "should return the correct rate interpolated from existing pairs when asked" do
-      d1 = Date.new(2001,1,1)
-      @bank.set_rate(d1, "USD", "EUR", 1.234)
-      @bank.set_rate(d1, "GBP", "USD", 1.456)
+    it 'should return the correct rate interpolated from existing pairs when asked' do
+      d1 = Date.new(2001, 1, 1)
+      @bank.set_rate(d1, 'USD', 'EUR', 1.234)
+      @bank.set_rate(d1, 'GBP', 'USD', 1.456)
 
-      assert_in_epsilon @bank.get_rate(d1, "EUR", "USD"), 1.0 / 1.234
-      assert_in_epsilon @bank.get_rate(d1, "GBP", "EUR"), 1.456 * 1.234
+      assert_in_epsilon @bank.get_rate(d1, 'EUR', 'USD'), 1.0 / 1.234
+      assert_in_epsilon @bank.get_rate(d1, 'GBP', 'EUR'), 1.456 * 1.234
     end
 
-    it "should return the correct rates using exchange_with a date" do
-      d1 = Date.new(2001,1,1)
-      @bank.set_rate(d1, "USD", "EUR", 0.73062465)
+    it 'should return the correct rates using exchange_with a date' do
+      d1 = Date.new(2001, 1, 1)
+      @bank.set_rate(d1, 'USD', 'EUR', 0.73062465)
       from = Money.new(5000, 'EUR')
       assert_equal @bank.exchange_with(d1, from, 'USD').cents, 6843
     end
-    it "should return the correct rates using exchange_with no date (today)" do
+    it 'should return the correct rates using exchange_with no date (today)' do
       d1 = Date.today
-      @bank.set_rate(d1, "USD", "EUR", 0.8)
+      @bank.set_rate(d1, 'USD', 'EUR', 0.8)
       from = Money.new(5000, 'EUR')
       assert_equal @bank.exchange_with(from, 'USD').cents, 6250
     end
-
   end
 
   describe 'no rates available yet' do
@@ -59,9 +57,9 @@ describe Money::Bank::HistoricalBank do
     end
 
     it 'should download new rates from url' do
-      source = Money::Bank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json'
+      source = "#{Money::Bank::OpenExchangeRatesLoader::HIST_URL}2009-09-09.json"
       stub(@bank).open(source) { File.open @cache_path }
-      d1 = Date.new(2009,9,9)
+      d1 = Date.new(2009, 9, 9)
 
       rate = @bank.get_rate(d1, 'USD', 'EUR')
       assert_equal rate, 0.73062465
@@ -72,34 +70,31 @@ describe Money::Bank::HistoricalBank do
         ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
       end
       it 'should download new rates from url' do
-        source = Money::Bank::OpenExchangeRatesLoader::HIST_URL + '2009-09-09.json' + '?app_id=example-of-app-id'
+        source = "#{Money::Bank::OpenExchangeRatesLoader::HIST_URL}2009-09-09.json?app_id=example-of-app-id"
         stub(@bank).open(source) { File.open @cache_path }
-        d1 = Date.new(2009,9,9)
+        d1 = Date.new(2009, 9, 9)
 
         rate = @bank.get_rate(d1, 'USD', 'EUR')
         assert_equal rate, 0.73062465
       end
     end
-
-
   end
 
   describe 'export/import' do
     before do
       @bank = Money::Bank::HistoricalBank.new
     end
-    it "should store any rate stored for a date, and retrieve it after importing exported json" do
-      d1 = Date.new(2001,1,1)
-      d2 = Date.new(2002,1,1)
-      @bank.set_rate(d1, "USD", "EUR", 1.234)
-      @bank.set_rate(d2, "GBP", "USD", 1.456)
+    it 'should store any rate stored for a date, and retrieve it after importing exported json' do
+      d1 = Date.new(2001, 1, 1)
+      d2 = Date.new(2002, 1, 1)
+      @bank.set_rate(d1, 'USD', 'EUR', 1.234)
+      @bank.set_rate(d2, 'GBP', 'USD', 1.456)
 
       json = @bank.export_rates(:json)
       @bank.import_rates(:json, json)
 
-      assert_equal @bank.get_rate(d1, "USD", "EUR"), 1.234
-      assert_equal @bank.get_rate(d2, "GBP", "USD"), 1.456
+      assert_equal @bank.get_rate(d1, 'USD', 'EUR'), 1.234
+      assert_equal @bank.get_rate(d2, 'GBP', 'USD'), 1.456
     end
   end
-
 end
