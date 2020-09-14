@@ -57,8 +57,8 @@ describe Money::Bank::HistoricalBank do
     end
 
     it 'should download new rates from url' do
-      source = "#{Money::Bank::OpenExchangeRatesLoader::HIST_URL}2009-09-09.json"
-      stub(Money::Bank::OpenExchangeRatesLoader).open(source) { File.open @cache_path }
+      source = "#{OpenExchangeRatesFetcher::HIST_URL}2009-09-09.json"
+      stub(URI).open(source) { File.open @cache_path }
       d1 = Date.new(2009, 9, 9)
 
       rate = @bank.get_rate(d1, 'USD', 'EUR')
@@ -70,8 +70,8 @@ describe Money::Bank::HistoricalBank do
         ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
       end
       it 'should download new rates from url' do
-        source = "#{Money::Bank::OpenExchangeRatesLoader::HIST_URL}2009-09-09.json?app_id=example-of-app-id"
-        stub(Money::Bank::OpenExchangeRatesLoader).open(source) { File.open @cache_path }
+        source = "#{OpenExchangeRatesFetcher::HIST_URL}2009-09-09.json?app_id=example-of-app-id"
+        stub(URI).open(source) { File.open @cache_path }
         d1 = Date.new(2009, 9, 9)
 
         rate = @bank.get_rate(d1, 'USD', 'EUR')

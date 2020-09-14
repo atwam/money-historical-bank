@@ -2,8 +2,9 @@
 
 require 'money'
 require 'date'
+require 'yajl'
 
-require "#{__dir__}/open_exchange_rates_loader"
+require "#{__dir__}/../../open_exchange_rates_fetcher"
 
 class Money
   module Bank
@@ -93,7 +94,7 @@ class Money
       # Won't do anything if there's no data available for that date
       # in OpenExchangeRates (short) history.
       def load_data(date)
-        data = OpenExchangeRatesLoader.fetch_data(date)
+        data = OpenExchangeRatesFetcher.fetch_data(date)
         doc = Yajl::Parser.parse(data)
 
         base_currency = doc['base'] || 'USD'
