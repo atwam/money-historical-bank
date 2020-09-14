@@ -50,14 +50,14 @@ describe Money::Bank::HistoricalBank do
   describe 'no rates available yet' do
     before do
       @bank = Money::Bank::HistoricalBank.new
-      @cache_path = "#{File.dirname(__FILE__)}/test.json"
       ENV['OPENEXCHANGERATES_APP_ID'] = nil
     end
 
     it 'should download new rates from url' do
-      source = "#{OpenExchangeRatesFetcher::BASE_API_URL}/historical/2009-09-09.json"
-      stub(URI).open(source) { File.open @cache_path }
-      d1 = Date.new(2009, 9, 9)
+      url = "#{OpenExchangeRatesFetcher::BASE_API_URL}/historical/2011-10-18.json"
+      fixture_path = "#{File.dirname(__FILE__)}/fixtures/2011-10-18.json"
+      stub(URI).open(url) { File.open fixture_path }
+      d1 = Date.new(2011, 10, 18)
 
       rate = @bank.get_rate(d1, 'USD', 'EUR')
       assert_equal rate, 0.73062465
