@@ -6,8 +6,6 @@ describe Money::Bank::HistoricalBank do
   describe 'update_rates' do
     before do
       @bank = Money::Bank::HistoricalBank.new
-      # @bank.cache = @cache_path
-      # @bank.update_rates
     end
 
     it 'should store any rate stored for a date, and retrieve it when asked' do
@@ -63,20 +61,6 @@ describe Money::Bank::HistoricalBank do
 
       rate = @bank.get_rate(d1, 'USD', 'EUR')
       assert_equal rate, 0.73062465
-    end
-
-    describe 'environment variable set with api id' do
-      before do
-        ENV['OPENEXCHANGERATES_APP_ID'] = 'example-of-app-id'
-      end
-      it 'should download new rates from url' do
-        source = "#{OpenExchangeRatesFetcher::BASE_API_URL}/historical/2009-09-09.json?app_id=example-of-app-id"
-        stub(URI).open(source) { File.open @cache_path }
-        d1 = Date.new(2009, 9, 9)
-
-        rate = @bank.get_rate(d1, 'USD', 'EUR')
-        assert_equal rate, 0.73062465
-      end
     end
   end
 
