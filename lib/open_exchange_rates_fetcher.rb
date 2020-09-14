@@ -11,11 +11,13 @@ module OpenExchangeRatesFetcher
   end
 
   def self.compute_url(date)
-    rates_source = if date == Date.today
-                     "#{BASE_API_URL}/latest.json"
-                   else
-                     "#{BASE_API_URL}/historical/#{date.strftime('%Y-%m-%d')}.json"
-                   end
+    path = if date == Date.today
+             '/latest.json'
+           else
+             "/historical/#{date.strftime('%Y-%m-%d')}.json"
+           end
+
+    rates_source = BASE_API_URL + path
 
     params = "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}"
 
