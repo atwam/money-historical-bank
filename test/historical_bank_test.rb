@@ -3,11 +3,12 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::HistoricalBank do
-  describe 'update_rates' do
-    before do
-      @bank = Money::Bank::HistoricalBank.new
-    end
+  before do
+    @bank = Money::Bank::HistoricalBank.new
+    ENV['OPENEXCHANGERATES_APP_ID'] = nil
+  end
 
+  describe 'update_rates' do
     it 'should store any rate stored for a date, and retrieve it when asked' do
       d1 = Date.new(2001, 1, 1)
       d2 = Date.new(2002, 1, 1)
@@ -48,11 +49,6 @@ describe Money::Bank::HistoricalBank do
   end
 
   describe 'no rates available yet' do
-    before do
-      @bank = Money::Bank::HistoricalBank.new
-      ENV['OPENEXCHANGERATES_APP_ID'] = nil
-    end
-
     it 'should download new rates from url' do
       url = "#{OpenExchangeRatesFetcher::BASE_API_URL}/historical/2011-10-18.json"
       fixture_path = "#{File.dirname(__FILE__)}/fixtures/2011-10-18.json"
@@ -65,9 +61,6 @@ describe Money::Bank::HistoricalBank do
   end
 
   describe 'export/import' do
-    before do
-      @bank = Money::Bank::HistoricalBank.new
-    end
     it 'should store any rate stored for a date, and retrieve it after importing exported json' do
       d1 = Date.new(2001, 1, 1)
       d2 = Date.new(2002, 1, 1)
