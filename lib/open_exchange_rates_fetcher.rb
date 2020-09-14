@@ -17,14 +17,8 @@ module OpenExchangeRatesFetcher
              "/historical/#{date.strftime('%Y-%m-%d')}.json"
            end
 
-    rates_source = BASE_API_URL + path
+    params = ("?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}" if ENV['OPENEXCHANGERATES_APP_ID'])
 
-    params = "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}"
-
-    if ENV['OPENEXCHANGERATES_APP_ID']
-      rates_source + params
-    else
-      rates_source
-    end
+    [BASE_API_URL, path, params].compact.join
   end
 end
