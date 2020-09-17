@@ -1,4 +1,5 @@
-# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'money'
 require 'date'
 require 'yajl'
@@ -17,10 +18,15 @@ class Money
         rates_source = if date == Date.today
                          OER_URL.dup
                        else
-                         HIST_URL + date.strftime('%Y-%m-%d') + '.json'
+                         "#{HIST_URL}#{date.strftime('%Y-%m-%d')}.json"
                        end
-        rates_source << "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}" if ENV['OPENEXCHANGERATES_APP_ID']
-        doc = Yajl::Parser.parse(open(rates_source).read)
+        params = "?app_id=#{ENV['OPENEXCHANGERATES_APP_ID']}"
+        url = if ENV['OPENEXCHANGERATES_APP_ID']
+                rates_source + params
+              else
+                rates_source
+              end
+        doc = Yajl::Parser.parse(open(url).read)
 
         base_currency = doc['base'] || 'USD'
 

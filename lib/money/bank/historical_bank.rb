@@ -1,19 +1,21 @@
-# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'money'
 require 'date'
 
-require File.expand_path(File.dirname(__FILE__)) + "/open_exchange_rates_loader"
+require "#{__dir__}/open_exchange_rates_loader"
 
 class Money
   module Bank
-    class InvalidCache < StandardError ; end
+    class InvalidCache < StandardError; end
 
     class HistoricalBank < Base
       include Money::Bank::OpenExchangeRatesLoader
 
       attr_reader :rates
+
       # Available formats for importing/exporting rates.
-      RATE_FORMATS = [:json, :ruby, :yaml]
+      RATE_FORMATS = %i[json ruby yaml].freeze
 
       def setup
         @rates = {}
@@ -74,17 +76,15 @@ class Money
             end
             unless rate
               # Tries to calculate a pair rate using USD rate
-              unless from_base_rate = existing_rates[rate_key_for("USD", from)]
-                from_inverse_rate = existing_rates[rate_key_for(from, "USD")]
+              unless from_base_rate = existing_rates[rate_key_for('USD', from)]
+                from_inverse_rate = existing_rates[rate_key_for(from, 'USD')]
                 from_base_rate = 1.0 / from_inverse_rate if from_inverse_rate
               end
-              unless to_base_rate = existing_rates[rate_key_for("USD", to)]
-                to_inverse_rate = existing_rates[rate_key_for(to, "USD")]
+              unless to_base_rate = existing_rates[rate_key_for('USD', to)]
+                to_inverse_rate = existing_rates[rate_key_for(to, 'USD')]
                 to_base_rate = 1.0 / to_inverse_rate if to_inverse_rate
               end
-              if to_base_rate && from_base_rate
-                rate = to_base_rate / from_base_rate
-              end
+              rate = to_base_rate / from_base_rate if to_base_rate && from_base_rate
             end
           end
           rate
@@ -139,10 +139,9 @@ class Money
         return from if same_currency?(from.currency, to_currency)
 
         rate = get_rate(date, from.currency, to_currency)
-        unless rate
-          raise UnknownRate, "No conversion rate available for #{date} '#{from.currency.iso_code}' -> '#{to_currency}'"
-        end
-        _to_currency_  = Currency.wrap(to_currency)
+        raise UnknownRate, "No conversion rate available for #{date} '#{from.currency.iso_code}' -> '#{to_currency}'" unless rate
+
+        _to_currency_ = Currency.wrap(to_currency)
 
         cents = BigDecimal(from.cents.to_s) / (BigDecimal(from.currency.subunit_to_unit.to_s) / BigDecimal(_to_currency_.subunit_to_unit.to_s))
 
@@ -176,12 +175,12 @@ class Money
       #
       #   s = bank.export_rates(:json)
       #   s #=> "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
-      def export_rates(format, file=nil)
+      def export_rates(format, file = nil)
         raise Money::Bank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
-        s = ""
-        @mutex.synchronize {
+        s = ''
+        @mutex.synchronize do
           s = case format
               when :json
                 JSON.dump(@rates)
@@ -191,10 +190,8 @@ class Money
                 YAML.dump(@rates)
               end
 
-          unless file.nil?
-            File.open(file, "w").write(s)
-          end
-        }
+          File.open(file, 'w').write(s) unless file.nil?
+        end
         s
       end
 
@@ -219,20 +216,21 @@ class Money
         raise Money::Bank::UnknownRateFormat unless
           RATE_FORMATS.include? format
 
-        @mutex.synchronize {
+        @mutex.synchronize do
           @rates = case format
                    when :json
                      JSON.load(s)
                    when :ruby
                      Marshal.load(s)
                    when :yaml
-                     YAML.load(s)
+                     YAML.safe_load(s)
                    end
-        }
+        end
         self
       end
 
       private
+
       # Return the rate hashkey for the given currencies.
       #
       # @param [Currency, String, Symbol] from The currency to exchange from.
