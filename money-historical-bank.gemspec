@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |s|
+  s.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
   s.name = 'money-historical-bank'
   s.version = '0.0.4'
   s.date = Time.now.utc.strftime('%Y-%m-%d')
