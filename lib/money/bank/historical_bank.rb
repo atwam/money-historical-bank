@@ -2,16 +2,15 @@
 
 require 'money'
 require 'date'
+require 'yajl'
 
-require "#{__dir__}/open_exchange_rates_loader"
+require "#{__dir__}/../../open_exchange_rates_fetcher"
 
 class Money
   module Bank
     class InvalidCache < StandardError; end
 
     class HistoricalBank < Base
-      include Money::Bank::OpenExchangeRatesLoader
-
       attr_reader :rates
 
       # Available formats for importing/exporting rates.
@@ -88,6 +87,22 @@ class Money
             end
           end
           rate
+        end
+      end
+
+      # Tries to load data from OpenExchangeRates for the given rate.
+      # Won't do anything if there's no data available for that date
+      # in OpenExchangeRates (short) history.
+      def load_data(date)
+        data = OpenExchangeRatesFetcher.fetch_data(date)
+        doc = Yajl::Parser.parse(data)
+
+        base_currency = doc['base'] || 'USD'
+
+        doc['rates'].each do |currency, rate|
+          # Don't use set_rate here, since this method can only be called from
+          # get_rate, which already aquired a mutex.
+          internal_set_rate(date, base_currency, currency, rate)
         end
       end
 
