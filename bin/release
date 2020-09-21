@@ -1,0 +1,16 @@
+#! /bin/sh
+set -ex
+
+old_version=$1
+new_version=$2
+
+version_files="money-historical-bank.gemspec"
+commit_message="Bumping version numbers for $new_version"
+tag_message="Tagging version $new_version"
+
+sed -i "" "s/$old_version/$new_version/g" $version_files
+git add .
+git commit --message "$commit_message"
+git push origin master
+git tag --annotate v$new_version --message "$tag_message"
+git push origin --tags

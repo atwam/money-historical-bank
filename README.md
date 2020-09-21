@@ -37,6 +37,21 @@ Created using mainly the base `VariableExchange` implementation, OpenExchangeRat
 Feel free to create a new loader (cf `OpenExchangeRatesLoader`) if you know a source for more historical data.
 Feel free to suggest refactoring.
 
+## Releasing
+
+This project is released by Travis when tags are pushed and one can do this like
+so:
+
+```
+$ ./bin/release 0.0.4 0.0.5
+```
+
+So that command will bump the gem to version 0.0.5, push on master, push tags
+and trigger Travis to release.
+
+Note: this script assumes you have called your remote `origin`, that it's
+pointing at atwam/money-historical-bank and that you have push access.
+
 ## License
 This gem is available under the *MIT license*
 
