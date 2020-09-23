@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'money-historical-bank'
-  spec.version = '0.0.4'
+  spec.version = '0.0.5'
   spec.authors = ['atwam', 'Jon Allured']
   spec.email = ['wam@atwam.com', 'jon.allured@gmail.com']
 
