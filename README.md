@@ -37,16 +37,20 @@ Created using mainly the base `VariableExchange` implementation, OpenExchangeRat
 Feel free to create a new loader (cf `OpenExchangeRatesLoader`) if you know a source for more historical data.
 Feel free to suggest refactoring.
 
-## License
-This gem is available under the *MIT license*
+## Releasing
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+This project is released by Travis when tags are pushed and one can do this like
+so:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+```
+$ ./bin/release 0.0.4 0.0.5
+```
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+So that command will bump the gem to version 0.0.5, push on master, push tags
+and trigger Travis to release.
 
-Copyright © 2012 Damien Couture <wam@atwam.com>
+Note: this script assumes you have called your remote `origin`, that it's
+pointing at atwam/money-historical-bank and that you have push access.
 
 [travis]: https://travis-ci.org/github/atwam/money-historical-bank
 [badge]: https://travis-ci.org/atwam/money-historical-bank.svg

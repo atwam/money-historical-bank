@@ -1,4 +1,3 @@
-*.lock
 *.gem
 *.swp
 .yardoc
