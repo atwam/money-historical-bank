@@ -22,7 +22,7 @@ describe Money::Bank::HistoricalBank do
     it "shouldn't throw an error when internal_set_rate is called with a non existing currency" do
       d1 = Date.new(2011, 1, 1)
       @bank.set_rate(d1, 'BLA', 'ZZZ', 1.01)
-      assert_empty @bank.rates
+      assert_empty @bank.store.instance_variable_get(:@rates)
     end
 
     it 'should return the correct rate interpolated from existing pairs when asked' do

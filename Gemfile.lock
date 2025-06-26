@@ -45,7 +45,7 @@ DEPENDENCIES
   minitest (~> 5, >= 5.0)
   money-historical-bank!
   rake
-  rr (~> 1.0, >= 1.0.4)
+  rr
   rubocop
 
 BUNDLED WITH

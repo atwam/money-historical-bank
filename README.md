@@ -25,6 +25,70 @@ mh.exchange_with(date, 1000.to_money('USD'), 'EUR') # => 763.4 EUR
 Money.default_bank = mh
 ```
 
+## Using with ActiveRecord
+
+You can use any persistent store that implements the `add_rate(date, from, to, rate)` and `get_rates(date)` methods. Here is an example implementation using an ActiveRecord model:
+
+First, generate a model:
+```sh
+rails g model exchange_rate from:string to:string rate:float date:date
+```
+
+Then, implement the store interface in the model:
+
+```ruby
+# app/models/exchange_rate.rb
+class ExchangeRate < ApplicationRecord
+  # Add new exchange rate.
+  # @param [String] from Currency ISO code. ex. 'USD'
+  # @param [String] to Currency ISO code. ex. 'CAD'
+  # @param [Numeric] rate Exchange rate. ex. 0.0016
+  # @param [Date] date Exchange rate date. ex. Date.today
+  def self.add_rate(from, to, rate, date)
+    exrate = find_or_initialize_by(from: from, to: to, date: date)
+    exrate.rate = rate
+    exrate.save!
+  end
+
+  # Get rate.
+  # @param [String] from Currency ISO code. ex. 'USD'
+  # @param [String] to Currency ISO code. ex. 'CAD'
+  # @param [Date] date Exchange rate date. ex. Date.today
+  #
+  # @return [Numeric] rate.
+  def self.get_rate(from, to, date)
+    rate = find_by(from:, to:, date:)
+    rate&.rate
+  end
+
+  # Gets all rates for a given date.
+  #
+  # @param [Date] date The date to retrieve rates for.
+  # @return [Hash] A hash of rates for the given date.
+  def self.get_rates(date)
+    where(date: date).each_with_object({}) do |rate, hash|
+      key = "#{rate.from}_TO_#{rate.to}".upcase
+      hash[key] = rate.rate
+    end
+  end
+
+  def self.marshal_dump
+    [self]
+  end
+end
+```
+
+Finally, initialize the bank with your new store:
+
+```ruby
+# config/initializers/money.rb
+require 'money/bank/historical_bank'
+
+# Use the ExchangeRate model as the store
+store = ExchangeRate
+Money.default_bank = Money::Bank::HistoricalBank.new(store)
+```
+
 ## Refs
 Created using mainly the base `VariableExchange` implementation, OpenExchangeRates implementation and idea based on `money-open-exchange-rates` gem.
 
