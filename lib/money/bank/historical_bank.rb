@@ -4,26 +4,30 @@ require 'money'
 require 'date'
 require 'yajl'
 
-require "#{__dir__}/../../open_exchange_rates_fetcher"
+require_relative '../rates_store/historical_memory'
+require_relative '../../open_exchange_rates_fetcher'
 
 class Money
   module Bank
     class InvalidCache < StandardError; end
 
     class HistoricalBank < Base
-      attr_reader :rates
-
       # Available formats for importing/exporting rates.
       RATE_FORMATS = %i[json ruby yaml].freeze
 
-      def setup
-        @rates = {}
-        @mutex = Mutex.new
-        self
+      attr_reader :store
+
+      # Initializes a new +Money::Bank::HistoricalBank+ object.
+      #
+      # @param [RateStore] st An exchange rate store, used to persist exchange rate pairs.
+      # @yield [n] Optional block to use when rounding after exchanging one
+      #  currency for another. See +Money::bank::base+
+      def initialize(st = Money::RatesStore::HistoricalMemory.new, &block)
+        @store = st
+        super(&block)
       end
 
       # Set the rate for the given currency pair at a given date.
-      # Uses +Mutex+ to synchronize data access.
       #
       # @param [Date] date Date for which the rate is valid.
       # @param [Currency, String, Symbol] from Currency to exchange from.
@@ -35,14 +39,11 @@ class Money
       #   bank = Money::Bank::HistoricalBank.new
       #   bank.set_rate(Date.new(2001, 1, 1), "USD", "CAD", 1.24514)
       def set_rate(date, from, to, rate)
-        @mutex.synchronize do
-          internal_set_rate(date, from, to, rate)
-        end
+        store.add_rate(from, to, rate, date)
       end
 
-      # Retrieve the rate for the given currencies. Uses +Mutex+ to synchronize
-      # data access. If no rates have been set for +date+, will try to load them
-      # using #load_data.
+      # Retrieve the rate for the given currencies. If no rates have been set for +date+,
+      # will try to load them using #load_data.
       #
       # @param [Date] date Date to retrieve the exchange rate at.
       # @param [Currency, String, Symbol] from Currency to exchange from.
@@ -60,11 +61,12 @@ class Money
       #   bank.get_rate(d1, "USD", "CAD") #=> 1.24515
       #   bank.get_rate(d2, "CAD", "USD") #=> 0.803115
       def get_rate(date, from, to)
-        @mutex.synchronize do
-          unless existing_rates = @rates[date.to_s]
+        store.transaction do
+          unless existing_rates = store.get_rates(date)
             load_data(date)
-            existing_rates = @rates[date.to_s]
+            existing_rates = store.get_rates(date)
           end
+
           rate = nil
           if existing_rates
             rate = existing_rates[rate_key_for(from, to)]
@@ -100,9 +102,7 @@ class Money
         base_currency = doc['base'] || 'USD'
 
         doc['rates'].each do |currency, rate|
-          # Don't use set_rate here, since this method can only be called from
-          # get_rate, which already aquired a mutex.
-          internal_set_rate(date, base_currency, currency, rate)
+          set_rate(date, base_currency, currency, rate)
         end
       end
 
@@ -191,22 +191,24 @@ class Money
       #   s = bank.export_rates(:json)
       #   s #=> "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
       def export_rates(format, file = nil)
-        raise Money::Bank::UnknownRateFormat unless
-          RATE_FORMATS.include? format
+        raise Money::Bank::UnknownRateFormat unless RATE_FORMATS.include? format
 
-        s = ''
-        @mutex.synchronize do
-          s = case format
-              when :json
-                JSON.dump(@rates)
-              when :ruby
-                Marshal.dump(@rates)
-              when :yaml
-                YAML.dump(@rates)
-              end
-
-          File.open(file, 'w').write(s) unless file.nil?
+        s = store.transaction do
+          rates = {}
+          store.each_rate do |date, from, to, rate|
+            rates[date] ||= {}
+            rates[date]["#{from}_TO_#{to}"] = rate
+          end
+          case format
+          when :json
+            JSON.dump(rates)
+          when :ruby
+            Marshal.dump(rates)
+          when :yaml
+            YAML.dump(rates)
+          end
         end
+        File.open(file, 'w').write(s) unless file.nil?
         s
       end
 
@@ -228,18 +230,23 @@ class Money
       #   bank.get_rate("USD", "CAD") #=> 1.24515
       #   bank.get_rate("CAD", "USD") #=> 0.803115
       def import_rates(format, s)
-        raise Money::Bank::UnknownRateFormat unless
-          RATE_FORMATS.include? format
+        raise Money::Bank::UnknownRateFormat unless RATE_FORMATS.include? format
 
-        @mutex.synchronize do
-          @rates = case format
-                   when :json
-                     JSON.load(s)
-                   when :ruby
-                     Marshal.load(s)
-                   when :yaml
-                     YAML.safe_load(s)
-                   end
+        store.transaction do
+          rates = case format
+                  when :json
+                    JSON.load(s)
+                  when :ruby
+                    Marshal.load(s)
+                  when :yaml
+                    YAML.safe_load(s)
+                  end
+          rates.each do |date, date_rates|
+            date_rates.each do |key, rate|
+              from, to = key.split('_TO_')
+              set_rate(date, from, to, rate)
+            end
+          end
         end
         self
       end
@@ -257,22 +264,6 @@ class Money
       #   rate_key_for("USD", "CAD") #=> "USD_TO_CAD"
       def rate_key_for(from, to)
         "#{Currency.wrap(from).iso_code}_TO_#{Currency.wrap(to).iso_code}".upcase
-      end
-
-      # Set the rate for the given currency pair at a given date.
-      # Doesn't use any mutex.
-      #
-      # @param [Date] date Date for which the rate is valid.
-      # @param [Currency, String, Symbol] from Currency to exchange from.
-      # @param [Currency, String, Symbol] to Currency to exchange to.
-      # @param [Numeric] rate Rate to use when exchanging currencies.
-      #
-      # @return [Numeric]
-      def internal_set_rate(date, from, to, rate)
-        if Money::Currency.find(from) && Money::Currency.find(to)
-          date_rates = @rates[date.to_s] ||= {}
-          date_rates[rate_key_for(from, to)] = rate
-        end
       end
     end
   end
